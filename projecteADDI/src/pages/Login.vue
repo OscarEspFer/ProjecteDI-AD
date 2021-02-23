@@ -7,6 +7,8 @@
         v-model="username"
         label="Usuari"
         hint="usuario"
+        lazy-rules
+        :rules="[ val => val && val.length > 0 || 'Please type something']"
       />
 
       <q-input
@@ -14,6 +16,8 @@
         v-model="password"
         label="Contrasenya"
         type="password"
+        lazy-rules
+        :rules="[ val => val && val.length > 0 || 'Please type something']"
       />
 
       <q-card-actions class="q-px-md">
