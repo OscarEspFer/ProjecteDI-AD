@@ -20,7 +20,7 @@
             <q-btn unelevated color="primary" size="lg" class="full-width" label="Login" />
           </q-card-actions>
           <q-card-section class="text-center q-pa-none">
-            <p class="text-grey-6">No estas registrat?<a href="#/Register">Registra't</a></p>
+            <p class="text-grey-6">Accedeix al registre<a href="#/Register">Registre</a></p>
           </q-card-section>
 
     </div>
