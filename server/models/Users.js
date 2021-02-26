@@ -119,8 +119,9 @@ class Users{
 				if (results.length){
 					let id = results[0].id
 					sql = "SELECT * FROM professor WHERE id_professor = ?"
-					conn.query(sql, [id], (results)=>{
-							if(results != null){
+					conn.query(sql, [id], (err,results)=>{
+                        console.log(results.length)
+							if(results != null && results.length != 0){
 								let autToken = jwt.sign({
                                     id:id,
                                     username:username,
@@ -158,20 +159,6 @@ class Users{
 				}
             })
         };
-
-    esProfessor(dni,callback){
-        let conn=this.mydb.getConnection();
-        let sql="SELECT * from dni_profe where dni =?";
-        conn.query(sql,[dni], (err,results,fields)=>{
-            if (err){
-                console.log(err)
-            }
-            else{
-                conn.end();
-                callback(results);
-            }
-        });
-    }
 
 }
 
