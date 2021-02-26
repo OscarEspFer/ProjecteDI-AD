@@ -48,7 +48,7 @@ const accessTokenSecret ='Abes';
                     next()
                 }
                 else{
-                    return res.sendStatus(403)
+                    return res.sendStatus(401)
                 }
             });
         }else{
@@ -70,7 +70,7 @@ const accessTokenSecret ='Abes';
                     next()
                 }
                 else{
-                    return res.sendStatus(403)
+                    return res.sendStatus(401)
                 }
             });
         }else{
@@ -109,4 +109,19 @@ const accessTokenSecret ='Abes';
         var assignatures = new Assignatura.Assignatura
         let id = req.params.assig
         assignatures.getAssignatura(id,res)
+    });
+
+    app.get('/moduls/:assig', authenticateJWTPROFE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id_assig = req.params.assig
+        notes.getAssignaturaModul(id_assig,res)
+    });
+
+    app.put('/moduls/:id_modul/:id_alumne', authenticateJWTPROFE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id_modul = req.params.id_modul
+        let id_alumne = req.params.id_alumne
+        let id_professor = req.user.id
+        let nota = req.body.nota
+        notes.putNotes(nota,id_modul,id_alumne,id_professor,res)
     });

@@ -1,9 +1,4 @@
 var db=require('../db/database');
-const jwt = require('jsonwebtoken');
-const express = require('express');
-const accessTokenSecret ='Abes';
-const refreshTokenSecret ='Slig';
-const refreshTokens = [];
 class Assignatura{
 
     mydb=new db.Database();
@@ -20,7 +15,7 @@ class Assignatura{
         conn.query(sql,[id],(err,results)=>{
             if (err){
                 console.log(err)
-                res.status(401).send({
+                res.status(400).send({
                     OK:false,
                     error:"Error al buscar assignatura"
                 });
