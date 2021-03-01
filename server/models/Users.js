@@ -1,6 +1,5 @@
 var db=require('../db/database');
 const jwt = require('jsonwebtoken');
-const express = require('express');
 const accessTokenSecret ='Abes';
 const refreshTokenSecret ='Slig';
 const refreshTokens = [];
@@ -35,7 +34,7 @@ class Users{
         conn.query(sql,[username,password,full_name,avatar],(err,results)=>{
             if (err){
                 console.log(err);
-                res.status(401).send({
+                res.status(400).send({
                     OK:false,
                     error:"Error inserint dades"+err
                 });
@@ -48,7 +47,7 @@ class Users{
                         sql = "INSERT INTO professor (id_professor) VALUES (?)"
                         conn.query(sql,[id],(err,results)=>{
                             if (err){
-                                res.status(401).send({
+                                res.status(400).send({
                                     OK:false,
                                     error:"Error al insertar professor"+err
                                 });
@@ -68,7 +67,8 @@ class Users{
 									refreshTokens.push(refreshToken);
                                 res.status(200).send({
                                     OK:true,
-                                    result:"professor insertat amb exit"
+                                    result:"professor insertat amb exit",
+                                    token:autToken
                                 });
                             }
                         });
@@ -77,7 +77,7 @@ class Users{
                         sql = "INSERT INTO alumne (id_alumne) VALUES (?)"
                         conn.query(sql,[id],(err,results)=>{
                             if (err){
-                                res.status(401).send({
+                                res.status(400).send({
                                     OK:false,
                                     error:"Error al insertar alumne"+err
                                 });
@@ -119,8 +119,9 @@ class Users{
 				if (results.length){
 					let id = results[0].id
 					sql = "SELECT * FROM professor WHERE id_professor = ?"
-					conn.query(sql, [id], (results)=>{
-							if(results != null){
+					conn.query(sql, [id], (err,results)=>{
+                        console.log(results.length)
+							if(results != null && results.length != 0){
 								let autToken = jwt.sign({
                                     id:id,
                                     username:username,
@@ -155,23 +156,15 @@ class Users{
 							}
 						})
 					}
+                    else{
+                        res.status(400).send({
+                            OK:false,
+                            result:"No existeix el user o la contrasenya es incorrecta",
+                        });
+                    }
 				}
             })
         };
-
-    esProfessor(dni,callback){
-        let conn=this.mydb.getConnection();
-        let sql="SELECT * from dni_profe where dni =?";
-        conn.query(sql,[dni], (err,results,fields)=>{
-            if (err){
-                console.log(err)
-            }
-            else{
-                conn.end();
-                callback(results);
-            }
-        });
-    }
 
 }
 

@@ -1,4 +1,6 @@
 var Users=require('./models/Users');
+var Notes=require('./models/Notes');
+var Assignatura=require('./models/Assignatures');
 const express = require('express');
 const https = require ('https');
 const fs = require ('fs');
@@ -20,7 +22,7 @@ const accessTokenSecret ='Abes';
   const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
         if(authHeader) {
-            const token = authHeader.split('')[1];
+            const token = authHeader.split(' ')[1];
             jwt.verify(token, accessTokenSecret, (err, user) => {
                 if(err) {
                     return res.sendStatus(403);
@@ -32,6 +34,50 @@ const accessTokenSecret ='Abes';
             res.sendStatus(401);
         }
     };
+
+    const authenticateJWTPROFE = (req,res,next)=>{
+        const authHeader = req.headers.authorization;
+        if(authHeader) {
+            const token = authHeader.split(' ')[1];
+            jwt.verify(token, accessTokenSecret, (err, user) => {
+                if(err) {
+                    return res.sendStatus(403);
+                }
+                req.user = user;
+                if(req.user.role=="professor"){
+                    next()
+                }
+                else{
+                    return res.sendStatus(401)
+                }
+            });
+        }else{
+            res.sendStatus(401);
+        }
+    };
+    
+    const authenticateJWTALUMNE = (req,res,next)=>{
+        const authHeader = req.headers.authorization;
+        if(authHeader) {
+            const token = authHeader.split(' ')[1];
+            jwt.verify(token, accessTokenSecret, (err, user) => {
+                if(err) {
+                    return res.sendStatus(403);
+                }
+                req.user = user;
+                if(req.user.role=="alumne"){
+                    console.log(req.user.role)
+                    next()
+                }
+                else{
+                    return res.sendStatus(401)
+                }
+            });
+        }else{
+            res.sendStatus(401);
+        }
+    };
+
     app.post('/login', (req,res) => {
         var usuari = new Users.Users
         usuari.LogIn(req.body.username,req.body.password,res)
@@ -41,4 +87,41 @@ const accessTokenSecret ='Abes';
         usuari.insertUser(req.body.username, req.body.password, req.body.full_name,req.body.dni,req.body.avatar,res,req
         );
     });
-        
+    app.get('/notes', authenticateJWT, (req,res) => {
+        var notes = new Notes.Notes
+        let id = req.user.id
+        notes.getNotes(id,res)
+    });
+    app.get('/notes/:nota', authenticateJWTALUMNE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id = req.user.id
+        let nota = req.params.nota
+        notes.getNota(id,nota,res)
+    });
+
+    app.get('/moduls', authenticateJWTPROFE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id = req.user.id
+        notes.getModuls(id,res)
+    });
+
+    app.get('/assignatura/:assig', authenticateJWTPROFE, (req,res)=>{
+        var assignatures = new Assignatura.Assignatura
+        let id = req.params.assig
+        assignatures.getAssignatura(id,res)
+    });
+
+    app.get('/moduls/:assig', authenticateJWTPROFE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id_assig = req.params.assig
+        notes.getAssignaturaModul(id_assig,res)
+    });
+
+    app.put('/moduls/:id_modul/:id_alumne', authenticateJWTPROFE, (req,res)=>{
+        var notes = new Notes.Notes
+        let id_modul = req.params.id_modul
+        let id_alumne = req.params.id_alumne
+        let id_professor = req.user.id
+        let nota = req.body.nota
+        notes.putNotes(nota,id_modul,id_alumne,id_professor,res)
+    });
